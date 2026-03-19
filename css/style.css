@@ -70,6 +70,12 @@ h1 {
   margin-bottom: 8px;
 }
 
+.icon-emoji {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+
 /* ===== Horizontal Rules ===== */
 hr {
   border: none;
