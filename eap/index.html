@@ -133,6 +133,58 @@
     }
     .notes-section ul { margin: 6px 0 0 20px; padding: 0; }
     .notes-section li { margin-bottom: 4px; }
+    .ballot-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .ballot-row:last-child { border-bottom: none; }
+    .ballot-row .nominee {
+      flex: 1;
+      font-size: 14px;
+    }
+    .ballot-row .nominee .affil {
+      color: #888;
+      font-size: 12.5px;
+      margin-left: 4px;
+    }
+    .ballot-row input[type="number"] {
+      width: 70px;
+      padding: 6px 8px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      background: #fff;
+      text-align: right;
+    }
+    .ballot-row input[type="number"]:focus {
+      outline: none;
+      border-color: #1a0dab;
+    }
+    .ballot-total {
+      margin-top: 14px;
+      padding: 8px 12px;
+      background: #fff;
+      border: 1px solid #e6e6e6;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: right;
+    }
+    .ballot-total.ok { color: #0a7d2c; border-color: #b7e4c4; background: #f1faf3; }
+    .ballot-total.over { color: #a30000; border-color: #f1c8c8; background: #fbf0f0; }
+    .preview-banner {
+      background: #fff7e0;
+      border: 1px solid #e0c870;
+      color: #6b5a16;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      margin-bottom: 12px;
+    }
     .hint {
       font-size: 12.5px;
       color: #888;
@@ -241,10 +293,34 @@
     <hr>
 
     <h2>Vote</h2>
-    <div class="form-section disabled">
+    <div id="vote-closed" class="form-section disabled">
       <p style="margin:0;">
         Voting opens <strong>Monday, June 1</strong>. The compiled list of nominees will appear here, and you'll allocate <strong>100 points</strong> across them however you'd like.
       </p>
+    </div>
+    <div id="vote-open" class="form-section" style="display:none;">
+      <p style="font-size:13.5px; color:#555; margin-top:0;">
+        Allocate <strong>100 points</strong> across the nominees according to your preference. Put all 100 on one person, spread them evenly, or anything in between. Leave a nominee blank if you don't want to allocate any points to them.
+      </p>
+      <form id="vote-form" onsubmit="return submitVote(event)">
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:0; margin-bottom:6px;">Your info</h3>
+        <div class="form-row">
+          <input type="text" name="voter_name" placeholder="Your name" autocomplete="name" required>
+          <input type="email" name="voter_email" placeholder="Your email" autocomplete="email" required>
+        </div>
+
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Ballot</h3>
+        <div id="ballot-rows"></div>
+
+        <div id="ballot-total" class="ballot-total">
+          Total: <span id="ballot-total-num">0</span> / 100
+        </div>
+
+        <div style="margin-top:14px;">
+          <button type="submit" class="submit">Submit vote</button>
+        </div>
+        <p class="hint">Deadline: Thursday, June 4.</p>
+      </form>
     </div>
 
     <hr>
@@ -300,6 +376,28 @@
 
     // Fallback recipients if the script call fails.
     const ORG_EMAILS = "yizhou.jin@utoronto.ca,regina.seibel@rotman.utoronto.ca";
+
+    // ---- Vote ballot ----
+    // On May 31, after nominations close, the organizers compile the final
+    // ballot here (external nominees from form submissions + auto-added past
+    // cancellations). Voting opens automatically once this array is non-empty.
+    // Each entry: { name: "...", affiliation: "..." }
+    const BALLOT = [
+      // Example (replace before June 1):
+      // { name: "Alessandro Gavazza", affiliation: "LSE" },
+      // { name: "Ali Yurukoglu", affiliation: "Stanford" },
+    ];
+
+    // Dummy ballot used when the page is loaded with ?preview in the URL,
+    // so organizers can preview the voting UI before populating BALLOT.
+    const PREVIEW_BALLOT = [
+      { name: "Alessandro Gavazza", affiliation: "LSE" },
+      { name: "Ali Yurukoglu", affiliation: "Stanford GSB" },
+      { name: "Chris Sullivan", affiliation: "Calgary" },
+      { name: "Ginger Jin", affiliation: "Maryland" },
+      { name: "Shoshana Vasserman", affiliation: "Stanford GSB" },
+      { name: "Christopher Conlon", affiliation: "NYU Stern" }
+    ];
 
     async function postToSheet(payload) {
       // text/plain content-type avoids a CORS preflight on Apps Script.
@@ -479,6 +577,136 @@
       }
       return false;
     }
+
+    // ---- Vote ----
+
+    function initVoting() {
+      const preview = new URLSearchParams(location.search).has("preview");
+      const ballot = preview ? PREVIEW_BALLOT : BALLOT;
+      const closed = document.getElementById("vote-closed");
+      const open = document.getElementById("vote-open");
+      if (ballot.length === 0) {
+        closed.style.display = "";
+        open.style.display = "none";
+        return;
+      }
+      closed.style.display = "none";
+      open.style.display = "";
+      renderBallot(ballot, preview);
+    }
+
+    function renderBallot(ballot, isPreview) {
+      const container = document.getElementById("ballot-rows");
+      container.innerHTML = "";
+      if (isPreview) {
+        const banner = document.createElement("div");
+        banner.className = "preview-banner";
+        banner.textContent = "Preview mode — this is what voters will see once the BALLOT array is populated. Submissions in preview mode still post to the live Sheet.";
+        container.parentNode.insertBefore(banner, container);
+      }
+      ballot.forEach((nominee, idx) => {
+        const row = document.createElement("div");
+        row.className = "ballot-row";
+        row.dataset.index = idx;
+        row.innerHTML =
+          '<div class="nominee">' +
+            escapeHtml(nominee.name) +
+            (nominee.affiliation ? '<span class="affil">(' + escapeHtml(nominee.affiliation) + ')</span>' : '') +
+          '</div>' +
+          '<input type="number" min="0" max="100" step="1" placeholder="0" oninput="updateBallotTotal()">';
+        container.appendChild(row);
+      });
+      updateBallotTotal();
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    function updateBallotTotal() {
+      let total = 0;
+      document.querySelectorAll(".ballot-row input[type=number]").forEach(inp => {
+        const v = parseFloat(inp.value);
+        if (!isNaN(v)) total += v;
+      });
+      const numEl = document.getElementById("ballot-total-num");
+      const wrap = document.getElementById("ballot-total");
+      numEl.textContent = total;
+      wrap.classList.remove("ok", "over");
+      if (total === 100) wrap.classList.add("ok");
+      else if (total > 100) wrap.classList.add("over");
+    }
+
+    function collectVotePayload(f) {
+      const preview = new URLSearchParams(location.search).has("preview");
+      const ballot = preview ? PREVIEW_BALLOT : BALLOT;
+      const allocations = [];
+      document.querySelectorAll(".ballot-row").forEach(row => {
+        const idx = parseInt(row.dataset.index, 10);
+        const points = parseFloat(row.querySelector('input[type=number]').value);
+        if (!isNaN(points) && points > 0) {
+          allocations.push({
+            name: ballot[idx].name,
+            affiliation: ballot[idx].affiliation || "",
+            points: points
+          });
+        }
+      });
+      return {
+        type: "vote",
+        voter_name: (f.voter_name.value || "").trim(),
+        voter_email: (f.voter_email.value || "").trim(),
+        allocations: allocations,
+        preview: preview
+      };
+    }
+
+    async function submitVote(e) {
+      e.preventDefault();
+      const f = e.target;
+      const payload = collectVotePayload(f);
+      if (payload.allocations.length === 0) {
+        alert("Please allocate points to at least one nominee.");
+        return false;
+      }
+      const total = payload.allocations.reduce((s, a) => s + a.points, 0);
+      if (total !== 100) {
+        const ok = confirm(
+          "Your points add up to " + total + ", not 100.\n\n" +
+          "Submit anyway? (Organizers will normalize ex-post.)"
+        );
+        if (!ok) return false;
+      }
+      const btn = f.querySelector('button[type="submit"]');
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+      try {
+        if (!SCRIPT_URL) throw new Error("Submission endpoint not configured.");
+        await postToSheet(payload);
+        showThanks(f, "Thanks! Your vote has been recorded.");
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = orig;
+        const proceed = confirm(
+          "Could not save submission automatically (" + err.message + ").\n\n" +
+          "Click OK to send your vote by email instead, or Cancel to retry."
+        );
+        if (proceed) {
+          const subject = "EAP/IO Seminar 2026-27: Vote from " + (payload.voter_name || "(anonymous)");
+          let body = `From: ${payload.voter_name} <${payload.voter_email}>\n\n` +
+            "Allocations:\n\n" +
+            payload.allocations.map(a => `${a.name}${a.affiliation ? " (" + a.affiliation + ")" : ""}: ${a.points}`).join("\n") +
+            `\n\nTotal: ${total}\n\n--\nSubmitted via the EAP organizing page.`;
+          mailtoFallback(subject, body);
+        }
+      }
+      return false;
+    }
+
+    document.addEventListener("DOMContentLoaded", initVoting);
   </script>
 
 </body>
