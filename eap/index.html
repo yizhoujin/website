@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EAP/IO Seminar 2026-27</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .timeline {
+      list-style: none;
+      margin: 8px 0 16px;
+      padding: 0;
+    }
+    .timeline li {
+      padding: 4px 0;
+      display: flex;
+      gap: 14px;
+      align-items: baseline;
+    }
+    .timeline .when {
+      flex: 0 0 150px;
+      color: #666;
+      font-size: 13px;
+    }
+    .timeline .what {
+      flex: 1;
+    }
+    .timeline .active {
+      color: #0a7d2c;
+      font-weight: 600;
+    }
+    .form-section {
+      background: #fafafa;
+      border: 1px solid #e6e6e6;
+      border-radius: 6px;
+      padding: 18px 20px;
+      margin: 12px 0 18px;
+    }
+    .form-section.disabled {
+      background: #f5f5f5;
+      color: #888;
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .form-row input {
+      flex: 1;
+      padding: 7px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .form-row input:focus {
+      outline: none;
+      border-color: #1a0dab;
+    }
+    .form-row input[name^="name"] { flex: 0 0 38%; }
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      background: #fff;
+      resize: vertical;
+      min-height: 80px;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #1a0dab;
+    }
+    button.submit {
+      margin-top: 10px;
+      padding: 9px 18px;
+      background: #1a0dab;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    button.submit:hover { background: #1505a0; }
+    button.submit:disabled {
+      background: #bbb;
+      cursor: not-allowed;
+    }
+    button.add-row {
+      background: none;
+      border: 1px dashed #b0b0b0;
+      color: #555;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    button.add-row:hover {
+      border-color: #1a0dab;
+      color: #1a0dab;
+    }
+    .form-row input[name="sf_name"] { flex: 0 0 30%; }
+    .form-row input[name="sf_email"] { flex: 0 0 35%; }
+    .form-row input[name="sf_date"] { flex: 1; }
+    .hint {
+      font-size: 12.5px;
+      color: #888;
+      margin-top: 6px;
+    }
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #111;
+      margin-top: 28px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <header>
+      <h1>Rotman EAP/IO Seminar &mdash; 2026&ndash;27</h1>
+      <p>
+        Time to line up next year's external speakers. Mondays at 4:00 PM, ~10 external slots.
+      </p>
+      <p style="color:#666; font-size:13px;">
+        Organizers: Yizhou Jin, Regina Seibel.
+      </p>
+    </header>
+
+    <hr>
+
+    <p>We follow a two-stage process this year:</p>
+    <ul class="timeline">
+      <li><span class="when active">May 26 &ndash; May 31</span><span class="what active">Nomination (open now)</span></li>
+      <li><span class="when">Jun 1 &ndash; Jun 4</span><span class="what">Voting &mdash; allocate 100 points across nominees</span></li>
+      <li><span class="when">Jun 5 onward</span><span class="what">Invitations begin going out to selected speakers</span></li>
+    </ul>
+
+    <hr>
+
+    <h2>Nominate (up to 5)</h2>
+    <p style="font-size:13.5px; color:#555;">
+      Enter the names and email addresses of external researchers you would like us to invite. Fill in only as many as you'd like &mdash; one is fine. Hitting submit will open your mail client with the entries pre-filled, addressed to the three organizers.
+    </p>
+    <div class="form-section">
+      <form id="nominate-form" onsubmit="return submitNomination(event)">
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:0; margin-bottom:6px;">Your info</h3>
+        <div class="form-row">
+          <input type="text" name="nominator_name" placeholder="Your name" autocomplete="name" required>
+          <input type="email" name="nominator_email" placeholder="Your email" autocomplete="email" required>
+        </div>
+
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Nominees (up to 5)</h3>
+        <div class="form-row">
+          <input type="text" name="name1" placeholder="Name 1" autocomplete="off">
+          <input type="email" name="email1" placeholder="email@institution.edu" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <input type="text" name="name2" placeholder="Name 2" autocomplete="off">
+          <input type="email" name="email2" placeholder="email@institution.edu" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <input type="text" name="name3" placeholder="Name 3" autocomplete="off">
+          <input type="email" name="email3" placeholder="email@institution.edu" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <input type="text" name="name4" placeholder="Name 4" autocomplete="off">
+          <input type="email" name="email4" placeholder="email@institution.edu" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <input type="text" name="name5" placeholder="Name 5" autocomplete="off">
+          <input type="email" name="email5" placeholder="email@institution.edu" autocomplete="off">
+        </div>
+
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Self-funded nominations</h3>
+        <p style="font-size:12.5px; color:#777; margin-bottom:8px;">
+          Speakers whose travel and lodging are covered by you or another source (e.g., visiting nearby and dropping in). No limit &mdash; these don't count against the ~10 external slots.
+        </p>
+        <div id="self-funded-rows">
+          <div class="form-row self-funded-row">
+            <input type="text" name="sf_name" placeholder="Name" autocomplete="off">
+            <input type="email" name="sf_email" placeholder="email@institution.edu" autocomplete="off">
+            <input type="text" name="sf_date" placeholder="Available date(s)" autocomplete="off">
+          </div>
+        </div>
+        <button type="button" class="add-row" onclick="addSelfFundedRow()">+ Add another</button>
+
+        <div style="margin-top:14px;">
+          <button type="submit" class="submit">Submit nominations</button>
+        </div>
+        <p class="hint">Deadline: Sunday, May 31.</p>
+      </form>
+    </div>
+
+    <hr>
+
+    <h2>Vote</h2>
+    <div class="form-section disabled">
+      <p style="margin:0;">
+        Voting opens <strong>Monday, June 1</strong>. The compiled list of nominees will appear here, and you'll allocate <strong>100 points</strong> across them however you'd like.
+      </p>
+    </div>
+
+    <hr>
+
+    <h2>Feedback</h2>
+    <div class="form-section">
+      <form id="feedback-form" onsubmit="return submitFeedback(event)">
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:0; margin-bottom:6px;">Add to the email list</h3>
+        <p style="font-size:12.5px; color:#777; margin-bottom:8px;">
+          Students, colleagues from other parts of UofT, anyone who should be getting seminar announcements.
+        </p>
+        <div id="mailing-rows">
+          <div class="form-row mailing-row">
+            <input type="text" name="ml_name" placeholder="Name" autocomplete="off">
+            <input type="email" name="ml_email" placeholder="email@institution.edu" autocomplete="off">
+          </div>
+        </div>
+        <button type="button" class="add-row" onclick="addMailingRow()">+ Add another</button>
+
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Other feedback</h3>
+        <p style="font-size:12.5px; color:#777; margin-bottom:8px;">
+          Anything on the process, room logistics, time slot, etc.
+        </p>
+        <textarea id="feedback-text" placeholder="Your feedback (optional name at the top if you want a reply)"></textarea>
+
+        <div style="margin-top:14px;">
+          <button type="submit" class="submit">Send</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+  <script>
+    // Paste the deployment URL of your Apps Script Web App here.
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmW98Hx26xoKYQd_NMesgxXrV_BkV5HjKjCE9oM6PM7DdJgGfIJiztPfN2cNuN4TAD/exec";
+
+    // Fallback recipients if the script call fails.
+    const ORG_EMAILS = "yizhou.jin@utoronto.ca,regina.seibel@rotman.utoronto.ca";
+
+    async function postToSheet(payload) {
+      // text/plain content-type avoids a CORS preflight on Apps Script.
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        redirect: "follow",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "text/plain;charset=utf-8" }
+      });
+      const data = await res.json();
+      if (data.status !== "ok") throw new Error(data.message || "Unknown error");
+      return data;
+    }
+
+    function showThanks(form, msg) {
+      const section = form.closest(".form-section");
+      section.innerHTML =
+        '<p style="margin:0; color:#0a7d2c; font-weight:600;">' + msg + '</p>';
+    }
+
+    function mailtoFallback(subject, body) {
+      window.location.href = "mailto:" + ORG_EMAILS +
+        "?subject=" + encodeURIComponent(subject) +
+        "&body=" + encodeURIComponent(body);
+    }
+
+    function addSelfFundedRow() {
+      const container = document.getElementById("self-funded-rows");
+      const row = document.createElement("div");
+      row.className = "form-row self-funded-row";
+      row.innerHTML =
+        '<input type="text" name="sf_name" placeholder="Name" autocomplete="off">' +
+        '<input type="email" name="sf_email" placeholder="email@institution.edu" autocomplete="off">' +
+        '<input type="text" name="sf_date" placeholder="Available date(s)" autocomplete="off">';
+      container.appendChild(row);
+    }
+
+    function addMailingRow() {
+      const container = document.getElementById("mailing-rows");
+      const row = document.createElement("div");
+      row.className = "form-row mailing-row";
+      row.innerHTML =
+        '<input type="text" name="ml_name" placeholder="Name" autocomplete="off">' +
+        '<input type="email" name="ml_email" placeholder="email@institution.edu" autocomplete="off">';
+      container.appendChild(row);
+    }
+
+    function collectNominationPayload(f) {
+      const nominees = [];
+      for (let i = 1; i <= 5; i++) {
+        const name = (f["name" + i].value || "").trim();
+        const email = (f["email" + i].value || "").trim();
+        if (name || email) nominees.push({ name, email });
+      }
+      const selfFunded = [];
+      document.querySelectorAll(".self-funded-row").forEach(row => {
+        const name = row.querySelector('input[name="sf_name"]').value.trim();
+        const email = row.querySelector('input[name="sf_email"]').value.trim();
+        const date = row.querySelector('input[name="sf_date"]').value.trim();
+        if (name || email || date) selfFunded.push({ name, email, date });
+      });
+      return {
+        type: "nomination",
+        nominator_name: (f.nominator_name.value || "").trim(),
+        nominator_email: (f.nominator_email.value || "").trim(),
+        nominees,
+        self_funded: selfFunded
+      };
+    }
+
+    async function submitNomination(e) {
+      e.preventDefault();
+      const f = e.target;
+      const payload = collectNominationPayload(f);
+      if (payload.nominees.length === 0 && payload.self_funded.length === 0) {
+        alert("Please add at least one nomination.");
+        return false;
+      }
+      const btn = f.querySelector('button[type="submit"]');
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+      try {
+        if (!SCRIPT_URL) throw new Error("Submission endpoint not configured.");
+        await postToSheet(payload);
+        showThanks(f, "Thanks! Your nominations have been recorded.");
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = orig;
+        const proceed = confirm(
+          "Could not save submission automatically (" + err.message + ").\n\n" +
+          "Click OK to send your nominations by email instead, or Cancel to retry."
+        );
+        if (proceed) {
+          const lines = payload.nominees.map((n, i) => `${i+1}. ${n.name}${n.email ? "  <" + n.email + ">" : ""}`);
+          const sfLines = payload.self_funded.map((n, i) => `${i+1}. ${n.name}${n.email ? "  <" + n.email + ">" : ""}${n.date ? "  [" + n.date + "]" : ""}`);
+          const subject = "EAP/IO Seminar 2026-27: Nominations from " + (payload.nominator_name || "(anonymous)");
+          let body = `From: ${payload.nominator_name} <${payload.nominator_email}>\n\n`;
+          if (lines.length) body += "Nominations:\n\n" + lines.join("\n") + "\n\n";
+          if (sfLines.length) body += "Self-funded nominations:\n\n" + sfLines.join("\n") + "\n\n";
+          mailtoFallback(subject, body);
+        }
+      }
+      return false;
+    }
+
+    function collectFeedbackPayload() {
+      const mailingList = [];
+      document.querySelectorAll(".mailing-row").forEach(row => {
+        const name = row.querySelector('input[name="ml_name"]').value.trim();
+        const email = row.querySelector('input[name="ml_email"]').value.trim();
+        if (name || email) mailingList.push({ name, email });
+      });
+      const text = document.getElementById("feedback-text").value.trim();
+      return { type: "feedback", mailing_list: mailingList, feedback: text };
+    }
+
+    async function submitFeedback(e) {
+      e.preventDefault();
+      const f = e.target;
+      const payload = collectFeedbackPayload();
+      if (payload.mailing_list.length === 0 && !payload.feedback) {
+        alert("Nothing to send.");
+        return false;
+      }
+      const btn = f.querySelector('button[type="submit"]');
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+      try {
+        if (!SCRIPT_URL) throw new Error("Submission endpoint not configured.");
+        await postToSheet(payload);
+        showThanks(f, "Thanks! Your feedback has been recorded.");
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = orig;
+        const proceed = confirm(
+          "Could not save submission automatically (" + err.message + ").\n\n" +
+          "Click OK to send by email instead, or Cancel to retry."
+        );
+        if (proceed) {
+          const subject = "EAP/IO Seminar 2026-27: Feedback";
+          let body = "";
+          if (payload.mailing_list.length) {
+            body += "Add to mailing list:\n\n" +
+              payload.mailing_list.map((m, i) => `${i+1}. ${m.name}${m.email ? "  <" + m.email + ">" : ""}`).join("\n") + "\n\n";
+          }
+          if (payload.feedback) body += "Feedback:\n\n" + payload.feedback + "\n\n";
+          mailtoFallback(subject, body);
+        }
+      }
+      return false;
+    }
+  </script>
+
+</body>
+</html>
