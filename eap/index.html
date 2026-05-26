@@ -633,10 +633,14 @@
       });
       const numEl = document.getElementById("ballot-total-num");
       const wrap = document.getElementById("ballot-total");
-      numEl.textContent = total;
+      // Round display to 1 decimal to avoid 99.99999... noise.
+      numEl.textContent = Math.round(total * 100) / 100;
       wrap.classList.remove("ok", "over");
-      if (total === 100) wrap.classList.add("ok");
+      const isHundred = Math.abs(total - 100) < 0.0001;
+      if (isHundred) wrap.classList.add("ok");
       else if (total > 100) wrap.classList.add("over");
+      const submitBtn = document.querySelector('#vote-form button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = !isHundred;
     }
 
     function collectVotePayload(f) {
@@ -667,17 +671,10 @@
       e.preventDefault();
       const f = e.target;
       const payload = collectVotePayload(f);
-      if (payload.allocations.length === 0) {
-        alert("Please allocate points to at least one nominee.");
-        return false;
-      }
       const total = payload.allocations.reduce((s, a) => s + a.points, 0);
-      if (total !== 100) {
-        const ok = confirm(
-          "Your points add up to " + total + ", not 100.\n\n" +
-          "Submit anyway? (Organizers will normalize ex-post.)"
-        );
-        if (!ok) return false;
+      if (Math.abs(total - 100) > 0.0001) {
+        alert("Your points must add up to exactly 100 (currently " + (Math.round(total * 100) / 100) + ").");
+        return false;
       }
       const btn = f.querySelector('button[type="submit"]');
       const orig = btn.textContent;
