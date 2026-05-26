@@ -108,6 +108,31 @@
     .form-row input[name="sf_name"] { flex: 0 0 30%; }
     .form-row input[name="sf_email"] { flex: 0 0 35%; }
     .form-row input[name="sf_date"] { flex: 1; }
+    .form-row input[name="st_name"] { flex: 0 0 30%; }
+    .form-row input[name="st_email"] { flex: 0 0 35%; }
+    .form-row select[name="st_confidence"] {
+      flex: 1;
+      padding: 7px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      background: #fff;
+      color: #333;
+    }
+    .form-row select:focus { outline: none; border-color: #1a0dab; }
+    .notes-section {
+      background: #f5f7ff;
+      border: 1px solid #dde3f3;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 12px 0 0;
+      font-size: 13.5px;
+      color: #444;
+      line-height: 1.65;
+    }
+    .notes-section ul { margin: 6px 0 0 20px; padding: 0; }
+    .notes-section li { margin-bottom: 4px; }
     .hint {
       font-size: 12.5px;
       color: #888;
@@ -129,7 +154,7 @@
     <header>
       <h1>Rotman EAP/IO Seminar &mdash; 2026&ndash;27</h1>
       <p>
-        Time to line up next year's external speakers. Mondays at 4:00 PM, ~10 external slots.
+        Time to line up next year's external speakers. Mondays 3:10&ndash;4:30 PM, September through mid-May. ~10 external slots.
       </p>
       <p style="color:#666; font-size:13px;">
         Organizers: Yizhou Jin, Regina Seibel.
@@ -159,7 +184,25 @@
           <input type="email" name="nominator_email" placeholder="Your email" autocomplete="email" required>
         </div>
 
-        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Nominees (up to 5)</h3>
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Your students going on the job market</h3>
+        <p style="font-size:12.5px; color:#777; margin-bottom:8px;">
+          Internal job-market candidates we should prioritize in September/October.
+        </p>
+        <div id="student-rows">
+          <div class="form-row student-row">
+            <input type="text" name="st_name" placeholder="Student name" autocomplete="off">
+            <input type="email" name="st_email" placeholder="email@utoronto.ca" autocomplete="off">
+            <select name="st_confidence">
+              <option value="">Confidence level</option>
+              <option value="For sure going">For sure going</option>
+              <option value="Likely going">Likely going</option>
+              <option value="Still deciding">Still deciding</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="add-row" onclick="addStudentRow()">+ Add another</button>
+
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">External nominees (up to 5)</h3>
         <div class="form-row">
           <input type="text" name="name1" placeholder="Name 1" autocomplete="off">
           <input type="email" name="email1" placeholder="email@institution.edu" autocomplete="off">
@@ -181,9 +224,9 @@
           <input type="email" name="email5" placeholder="email@institution.edu" autocomplete="off">
         </div>
 
-        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Self-funded nominations</h3>
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Self-funded or GTA-local nominations</h3>
         <p style="font-size:12.5px; color:#777; margin-bottom:8px;">
-          Speakers whose travel and lodging are covered by you or another source (e.g., visiting nearby and dropping in). No limit &mdash; these don't count against the ~10 external slots.
+          Speakers based in the GTA, or whose travel and lodging are covered by you or another source (e.g., visiting nearby and dropping in). No limit &mdash; these don't count against the ~10 external slots.
         </p>
         <div id="self-funded-rows">
           <div class="form-row self-funded-row">
@@ -239,6 +282,17 @@
       </form>
     </div>
 
+    <div class="notes-section">
+      <strong>A few notes on the process:</strong>
+      <ul>
+        <li>Seminars run Mondays, 3:10&ndash;4:30 PM, September through mid-May.</li>
+        <li>We will prioritize internal job market candidates in September/October.</li>
+        <li>We avoid scheduling external job market talks in January and early February.</li>
+        <li>Speakers who cancelled in past years will be automatically added to the voting ballot.</li>
+        <li>We will respect clear winners from the vote, but retain some flexibility to balance gender ratios and, given budget constraints, prioritize Canadian or Northeastern US speakers.</li>
+      </ul>
+    </div>
+
   </div>
 
   <script>
@@ -284,6 +338,22 @@
       container.appendChild(row);
     }
 
+    function addStudentRow() {
+      const container = document.getElementById("student-rows");
+      const row = document.createElement("div");
+      row.className = "form-row student-row";
+      row.innerHTML =
+        '<input type="text" name="st_name" placeholder="Student name" autocomplete="off">' +
+        '<input type="email" name="st_email" placeholder="email@utoronto.ca" autocomplete="off">' +
+        '<select name="st_confidence">' +
+          '<option value="">Confidence level</option>' +
+          '<option value="For sure going">For sure going</option>' +
+          '<option value="Likely going">Likely going</option>' +
+          '<option value="Still deciding">Still deciding</option>' +
+        '</select>';
+      container.appendChild(row);
+    }
+
     function addMailingRow() {
       const container = document.getElementById("mailing-rows");
       const row = document.createElement("div");
@@ -295,6 +365,13 @@
     }
 
     function collectNominationPayload(f) {
+      const students = [];
+      document.querySelectorAll(".student-row").forEach(row => {
+        const name = row.querySelector('input[name="st_name"]').value.trim();
+        const email = row.querySelector('input[name="st_email"]').value.trim();
+        const confidence = row.querySelector('select[name="st_confidence"]').value;
+        if (name || email) students.push({ name, email, confidence });
+      });
       const nominees = [];
       for (let i = 1; i <= 5; i++) {
         const name = (f["name" + i].value || "").trim();
@@ -312,6 +389,7 @@
         type: "nomination",
         nominator_name: (f.nominator_name.value || "").trim(),
         nominator_email: (f.nominator_email.value || "").trim(),
+        students,
         nominees,
         self_funded: selfFunded
       };
@@ -321,7 +399,7 @@
       e.preventDefault();
       const f = e.target;
       const payload = collectNominationPayload(f);
-      if (payload.nominees.length === 0 && payload.self_funded.length === 0) {
+      if (payload.students.length === 0 && payload.nominees.length === 0 && payload.self_funded.length === 0) {
         alert("Please add at least one nomination.");
         return false;
       }
@@ -341,12 +419,14 @@
           "Click OK to send your nominations by email instead, or Cancel to retry."
         );
         if (proceed) {
+          const stLines = payload.students.map((n, i) => `${i+1}. ${n.name}${n.email ? "  <" + n.email + ">" : ""}${n.confidence ? "  [" + n.confidence + "]" : ""}`);
           const lines = payload.nominees.map((n, i) => `${i+1}. ${n.name}${n.email ? "  <" + n.email + ">" : ""}`);
           const sfLines = payload.self_funded.map((n, i) => `${i+1}. ${n.name}${n.email ? "  <" + n.email + ">" : ""}${n.date ? "  [" + n.date + "]" : ""}`);
           const subject = "EAP/IO Seminar 2026-27: Nominations from " + (payload.nominator_name || "(anonymous)");
           let body = `From: ${payload.nominator_name} <${payload.nominator_email}>\n\n`;
-          if (lines.length) body += "Nominations:\n\n" + lines.join("\n") + "\n\n";
-          if (sfLines.length) body += "Self-funded nominations:\n\n" + sfLines.join("\n") + "\n\n";
+          if (stLines.length) body += "Students going on the job market:\n\n" + stLines.join("\n") + "\n\n";
+          if (lines.length) body += "External nominees:\n\n" + lines.join("\n") + "\n\n";
+          if (sfLines.length) body += "Self-funded or GTA-local nominations:\n\n" + sfLines.join("\n") + "\n\n";
           mailtoFallback(subject, body);
         }
       }
