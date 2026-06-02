@@ -211,8 +211,8 @@
 
     <p>We follow a two-stage process this year:</p>
     <ul class="timeline">
-      <li><span class="when active">May 26 &ndash; May 31</span><span class="what active">Nomination (open now)</span></li>
-      <li><span class="when">Jun 1 &ndash; Jun 4</span><span class="what">Voting &mdash; allocate 100 points across nominees</span></li>
+      <li><span class="when">May 26 &ndash; May 31</span><span class="what">Nomination (closed)</span></li>
+      <li><span class="when active">Jun 1 &ndash; Jun 4</span><span class="what active">Voting &mdash; allocate 100 points across nominees (open now)</span></li>
       <li><span class="when">Jun 5 onward</span><span class="what">Invitations begin going out to selected speakers</span></li>
     </ul>
 
@@ -383,9 +383,38 @@
     // cancellations). Voting opens automatically once this array is non-empty.
     // Each entry: { name: "...", affiliation: "..." }
     const BALLOT = [
-      // Example (replace before June 1):
-      // { name: "Alessandro Gavazza", affiliation: "LSE" },
-      // { name: "Ali Yurukoglu", affiliation: "Stanford" },
+      { name: "Matthew Backus", affiliation: "Berkeley Haas" },
+      { name: "Levon Barseghyan", affiliation: "Cornell" },
+      { name: "David Byrne", affiliation: "Melbourne" },
+      { name: "José Ignacio Cuesta", affiliation: "Stanford" },
+      { name: "Rebekah Dix", affiliation: "Stanford" },
+      { name: "Jean-Pierre Dube", affiliation: "Chicago Booth" },
+      { name: "Pierre Dubois", affiliation: "Toulouse" },
+      { name: "Keith Ericson", affiliation: "BU" },
+      { name: "Vitor Farinha Luz", affiliation: "UBC" },
+      { name: "Andres Gonzalez-Lira", affiliation: "PUC Chile" },
+      { name: "Matthew Grennan", affiliation: "Berkeley Haas" },
+      { name: "Igal Hendel", affiliation: "Northwestern" },
+      { name: "Jean Francois Houde", affiliation: "Wisconsin" },
+      { name: "Yufeng Huang", affiliation: "Rochester (Simon)" },
+      { name: "Thomas Hubbard", affiliation: "Kellogg" },
+      { name: "Myrto Kalouptsidi", affiliation: "Harvard" },
+      { name: "Yunmi Kong", affiliation: "Rice" },
+      { name: "Greg Lewis", affiliation: "Amazon" },
+      { name: "Lorenzo Magnolfi", affiliation: "Wisconsin" },
+      { name: "Guillermo Marshall", affiliation: "UBC Sauder" },
+      { name: "Leslie Marx", affiliation: "Duke" },
+      { name: "Nathan Miller", affiliation: "Georgetown" },
+      { name: "Francesca Molinari", affiliation: "Cornell" },
+      { name: "Felix Montag", affiliation: "NYU Stern" },
+      { name: "Charlie Murry", affiliation: "Michigan" },
+      { name: "Leon Musolff", affiliation: "Wharton" },
+      { name: "Eric Richert", affiliation: "Chicago" },
+      { name: "Justin Sydnor", affiliation: "Wisconsin" },
+      { name: "Elie Tamer", affiliation: "Harvard" },
+      { name: "Audrey Tiew", affiliation: "NYU" },
+      { name: "Frank Verboven", affiliation: "KU Leuven" },
+      { name: "Tianli Xia", affiliation: "Rochester" },
     ];
 
     // Dummy ballot used when the page is loaded with ?preview in the URL,
