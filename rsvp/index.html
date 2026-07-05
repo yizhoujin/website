@@ -101,48 +101,88 @@
           <input type="text" id="rsvp-dietary" name="dietary" placeholder="e.g. vegetarian, nut allergy, none">
         </div>
         <button type="submit" class="submit">Send RSVP</button>
-        <p class="hint">This opens your email app with your RSVP ready &mdash; just hit send. Hope to see you there!</p>
+        <p class="hint">Hope to see you there!</p>
       </form>
     </div>
 
   </div>
 
   <script>
-    // RSVPs are sent as a pre-filled email to the host. No backend needed.
+    // Apps Script Web App URL — RSVPs are appended as rows to the "RSVPs"
+    // tab of the private "Birthday RSVPs" Google Sheet.
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtipKbaPOdYB1wx4olcfUmCD8VeefIbKoGTcT7WqJHbe4QPWN51pTpWUFPGIU4cPzBMQ/exec";
+
+    // Fallback recipient if the Sheet submission ever fails.
     const HOST_EMAIL = "ejoejin@gmail.com";
 
-    function submitRsvp(e) {
-      e.preventDefault();
-      const f = e.target;
-      const name = (f.name.value || "").trim();
-      const count = (f.count.value || "").trim();
-      const phone = (f.phone.value || "").trim();
-      const dietary = (f.dietary.value || "").trim();
-      if (!name || !count || !phone) {
-        alert("Please fill in your name, number of people, and phone.");
-        return false;
-      }
-      const subject = "Birthday RSVP from " + name;
-      const body =
-        "Name: " + name + "\n" +
-        "Number of people: " + count + "\n" +
-        "Phone: " + phone + "\n" +
-        "Dietary restrictions: " + (dietary || "(none)") + "\n";
-      window.location.href = "mailto:" + HOST_EMAIL +
-        "?subject=" + encodeURIComponent(subject) +
-        "&body=" + encodeURIComponent(body);
-      const section = f.closest(".form-section");
-      section.innerHTML =
-        '<p style="margin:0 0 8px; color:#0a7d2c; font-weight:600;">Almost done, ' + escapeHtml(name) + '! 🎉</p>' +
-        '<p style="margin:0; color:#444; line-height:1.6;">Your email app should have opened with your RSVP filled in &mdash; just press <strong>Send</strong>. ' +
-        'If nothing opened, email me directly at <a href="mailto:' + HOST_EMAIL + '">' + HOST_EMAIL + '</a>.</p>';
-      return false;
+    async function postToSheet(payload) {
+      // text/plain content-type avoids a CORS preflight on Apps Script.
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        redirect: "follow",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "text/plain;charset=utf-8" }
+      });
+      const data = await res.json();
+      if (data.status !== "ok") throw new Error(data.message || "Unknown error");
+      return data;
     }
 
     function escapeHtml(s) {
       return String(s).replace(/[&<>"']/g, function (c) {
         return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
       });
+    }
+
+    function mailtoFallback(subject, body) {
+      window.location.href = "mailto:" + HOST_EMAIL +
+        "?subject=" + encodeURIComponent(subject) +
+        "&body=" + encodeURIComponent(body);
+    }
+
+    async function submitRsvp(e) {
+      e.preventDefault();
+      const f = e.target;
+      const payload = {
+        type: "rsvp",
+        name: (f.name.value || "").trim(),
+        count: (f.count.value || "").trim(),
+        phone: (f.phone.value || "").trim(),
+        dietary: (f.dietary.value || "").trim()
+      };
+      if (!payload.name || !payload.count || !payload.phone) {
+        alert("Please fill in your name, number of people, and phone.");
+        return false;
+      }
+      const btn = f.querySelector('button[type="submit"]');
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Sending...";
+      try {
+        if (!SCRIPT_URL) throw new Error("Submission endpoint not configured.");
+        await postToSheet(payload);
+        const section = f.closest(".form-section");
+        section.innerHTML =
+          '<p style="margin:0; color:#0a7d2c; font-weight:600;">Thanks, ' +
+          escapeHtml(payload.name) + '! Your RSVP is in. See you there 🎉</p>';
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = orig;
+        const proceed = confirm(
+          "Could not save your RSVP automatically (" + err.message + ").\n\n" +
+          "Click OK to send it by email instead, or Cancel to retry."
+        );
+        if (proceed) {
+          const subject = "Birthday RSVP from " + (payload.name || "(no name)");
+          const body =
+            "Name: " + payload.name + "\n" +
+            "Number of people: " + payload.count + "\n" +
+            "Phone: " + payload.phone + "\n" +
+            "Dietary restrictions: " + (payload.dietary || "(none)") + "\n";
+          mailtoFallback(subject, body);
+        }
+      }
+      return false;
     }
   </script>
 
