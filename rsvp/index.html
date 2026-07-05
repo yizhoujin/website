@@ -101,84 +101,48 @@
           <input type="text" id="rsvp-dietary" name="dietary" placeholder="e.g. vegetarian, nut allergy, none">
         </div>
         <button type="submit" class="submit">Send RSVP</button>
-        <p class="hint">Hope to see you there!</p>
+        <p class="hint">This opens your email app with your RSVP ready &mdash; just hit send. Hope to see you there!</p>
       </form>
     </div>
 
   </div>
 
   <script>
-    // Paste the deployment URL of your Apps Script Web App here.
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBEKfaiw0wc_YRhbQv1k5MdbaptqAzv3WYJdti1QQjE_qZYsjGL2u2pq4Rc1_NmfvQlA/exec";
-
-    // Fallback recipient if the script call fails.
+    // RSVPs are sent as a pre-filled email to the host. No backend needed.
     const HOST_EMAIL = "ejoejin@gmail.com";
 
-    async function postToSheet(payload) {
-      // text/plain content-type avoids a CORS preflight on Apps Script.
-      const res = await fetch(SCRIPT_URL, {
-        method: "POST",
-        redirect: "follow",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "text/plain;charset=utf-8" }
-      });
-      const data = await res.json();
-      if (data.status !== "ok") throw new Error(data.message || "Unknown error");
-      return data;
-    }
-
-    function showThanks(form, msg) {
-      const section = form.closest(".form-section");
-      section.innerHTML =
-        '<p style="margin:0; color:#0a7d2c; font-weight:600;">' + msg + '</p>';
-    }
-
-    function mailtoFallback(subject, body) {
+    function submitRsvp(e) {
+      e.preventDefault();
+      const f = e.target;
+      const name = (f.name.value || "").trim();
+      const count = (f.count.value || "").trim();
+      const phone = (f.phone.value || "").trim();
+      const dietary = (f.dietary.value || "").trim();
+      if (!name || !count || !phone) {
+        alert("Please fill in your name, number of people, and phone.");
+        return false;
+      }
+      const subject = "Birthday RSVP from " + name;
+      const body =
+        "Name: " + name + "\n" +
+        "Number of people: " + count + "\n" +
+        "Phone: " + phone + "\n" +
+        "Dietary restrictions: " + (dietary || "(none)") + "\n";
       window.location.href = "mailto:" + HOST_EMAIL +
         "?subject=" + encodeURIComponent(subject) +
         "&body=" + encodeURIComponent(body);
+      const section = f.closest(".form-section");
+      section.innerHTML =
+        '<p style="margin:0 0 8px; color:#0a7d2c; font-weight:600;">Almost done, ' + escapeHtml(name) + '! 🎉</p>' +
+        '<p style="margin:0; color:#444; line-height:1.6;">Your email app should have opened with your RSVP filled in &mdash; just press <strong>Send</strong>. ' +
+        'If nothing opened, email me directly at <a href="mailto:' + HOST_EMAIL + '">' + HOST_EMAIL + '</a>.</p>';
+      return false;
     }
 
-    async function submitRsvp(e) {
-      e.preventDefault();
-      const f = e.target;
-      const payload = {
-        type: "rsvp",
-        name: (f.name.value || "").trim(),
-        count: (f.count.value || "").trim(),
-        phone: (f.phone.value || "").trim(),
-        dietary: (f.dietary.value || "").trim()
-      };
-      if (!payload.name || !payload.count || !payload.phone) {
-        alert("Please fill in all three fields.");
-        return false;
-      }
-      const btn = f.querySelector('button[type="submit"]');
-      const orig = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = "Sending...";
-      try {
-        if (!SCRIPT_URL) throw new Error("Submission endpoint not configured.");
-        await postToSheet(payload);
-        showThanks(f, "Thanks, " + payload.name + "! Your RSVP is in. See you there 🎉");
-      } catch (err) {
-        btn.disabled = false;
-        btn.textContent = orig;
-        const proceed = confirm(
-          "Could not save your RSVP automatically (" + err.message + ").\n\n" +
-          "Click OK to send it by email instead, or Cancel to retry."
-        );
-        if (proceed) {
-          const subject = "Birthday RSVP from " + (payload.name || "(no name)");
-          const body =
-            "Name: " + payload.name + "\n" +
-            "Number of people: " + payload.count + "\n" +
-            "Phone: " + payload.phone + "\n" +
-            "Dietary restrictions: " + (payload.dietary || "(none)") + "\n";
-          mailtoFallback(subject, body);
-        }
-      }
-      return false;
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
     }
   </script>
 
