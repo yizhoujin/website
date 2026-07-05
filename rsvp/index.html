@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birthday RSVP</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .event-details {
+      font-size: 15px;
+      color: #444;
+      line-height: 1.8;
+      margin: 6px 0 20px;
+    }
+    .event-details strong { color: #111; }
+    .form-section {
+      background: #fafafa;
+      border: 1px solid #e6e6e6;
+      border-radius: 6px;
+      padding: 18px 20px;
+      margin: 12px 0 18px;
+    }
+    .form-field {
+      margin-bottom: 14px;
+    }
+    .form-field label {
+      display: block;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .form-field input {
+      width: 100%;
+      padding: 9px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .form-field input:focus {
+      outline: none;
+      border-color: #1a0dab;
+    }
+    button.submit {
+      margin-top: 4px;
+      padding: 9px 18px;
+      background: #1a0dab;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    button.submit:hover { background: #1505a0; }
+    button.submit:disabled {
+      background: #bbb;
+      cursor: not-allowed;
+    }
+    .hint {
+      font-size: 12.5px;
+      color: #888;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <header>
+      <h1>Yizhou's Birthday Party! &#127881;</h1>
+    </header>
+
+    <hr>
+
+    <p class="event-details">
+      <strong>When:</strong> July 11, starts around 5:00 p.m.<br>
+      <strong>Where:</strong> 21 Rose Park Drive<br>
+      We're ordering food &mdash; bring your favorite drinks. Let me know if you can make it!
+    </p>
+
+    <div class="form-section">
+      <form id="rsvp-form" onsubmit="return submitRsvp(event)">
+        <div class="form-field">
+          <label for="rsvp-name">Your name</label>
+          <input type="text" id="rsvp-name" name="name" placeholder="First and last name" autocomplete="name" required>
+        </div>
+        <div class="form-field">
+          <label for="rsvp-count">Number of people (including you)</label>
+          <input type="number" id="rsvp-count" name="count" min="1" step="1" placeholder="1" required>
+        </div>
+        <div class="form-field">
+          <label for="rsvp-phone">Phone number</label>
+          <input type="tel" id="rsvp-phone" name="phone" placeholder="(555) 123-4567" autocomplete="tel" required>
+        </div>
+        <div class="form-field">
+          <label for="rsvp-dietary">Dietary restrictions <span style="color:#999;">(optional)</span></label>
+          <input type="text" id="rsvp-dietary" name="dietary" placeholder="e.g. vegetarian, nut allergy, none">
+        </div>
+        <button type="submit" class="submit">Send RSVP</button>
+        <p class="hint">This opens your email app with your RSVP ready &mdash; just hit send. Hope to see you there!</p>
+      </form>
+    </div>
+
+  </div>
+
+  <script>
+    // RSVPs are sent as a pre-filled email to the host. No backend needed.
+    const HOST_EMAIL = "ejoejin@gmail.com";
+
+    function submitRsvp(e) {
+      e.preventDefault();
+      const f = e.target;
+      const name = (f.name.value || "").trim();
+      const count = (f.count.value || "").trim();
+      const phone = (f.phone.value || "").trim();
+      const dietary = (f.dietary.value || "").trim();
+      if (!name || !count || !phone) {
+        alert("Please fill in your name, number of people, and phone.");
+        return false;
+      }
+      const subject = "Birthday RSVP from " + name;
+      const body =
+        "Name: " + name + "\n" +
+        "Number of people: " + count + "\n" +
+        "Phone: " + phone + "\n" +
+        "Dietary restrictions: " + (dietary || "(none)") + "\n";
+      window.location.href = "mailto:" + HOST_EMAIL +
+        "?subject=" + encodeURIComponent(subject) +
+        "&body=" + encodeURIComponent(body);
+      const section = f.closest(".form-section");
+      section.innerHTML =
+        '<p style="margin:0 0 8px; color:#0a7d2c; font-weight:600;">Almost done, ' + escapeHtml(name) + '! 🎉</p>' +
+        '<p style="margin:0; color:#444; line-height:1.6;">Your email app should have opened with your RSVP filled in &mdash; just press <strong>Send</strong>. ' +
+        'If nothing opened, email me directly at <a href="mailto:' + HOST_EMAIL + '">' + HOST_EMAIL + '</a>.</p>';
+      return false;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+  </script>
+
+</body>
+</html>
