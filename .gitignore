@@ -4,6 +4,6 @@ _private/
 
 # private working files — never publish (repo is public)
 files/eap-seminar/
-files/rs_cl_yjin/
+files/rs_cl*/
 
 .DS_Store
