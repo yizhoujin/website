@@ -1,3 +1,9 @@
 files/wix/
 img/055A4375.jpg
 _private/
+
+# private working files — never publish (repo is public)
+files/eap-seminar/
+files/rs_cl_yjin/
+
+.DS_Store
