@@ -1,0 +1,51 @@
+#!/bin/sh
+# Pre-commit gate for a PUBLIC website repo.
+#
+# Guards the two directions in which a silent directory RENAME breaks things:
+#   Gate 1  a private/working dir under files/ becoming publishable
+#   Gate 2  a published dir being renamed out from under the site's links
+#
+# Both read the INDEX (what is actually being committed), not the working tree.
+# Install once per clone:  git config core.hooksPath .githooks
+
+ALLOW='^files/(cv|other|research|teaching|temp)/'
+fail=0
+
+# --- Gate 1: files/ publish allowlist -------------------------------------
+echo "[gate] files/ publish allowlist ..."
+offenders=$(git diff --cached --name-only --diff-filter=ACMR | grep '^files/' | grep -Ev "$ALLOW")
+if [ -n "$offenders" ]; then
+  echo "[gate] BLOCKED: these are staged under files/ but are not on the publish allowlist:"
+  echo "$offenders" | sed 's/^/          /'
+  echo "          This repo is PUBLIC (www.yizhoujin.com)."
+  echo "          If it really should be published, add a '!' line to .gitignore."
+  fail=1
+else
+  echo "[gate] files/ publish allowlist OK."
+fi
+
+# --- Gate 2: every local files/ link resolves to a tracked file -----------
+echo "[gate] local files/ link integrity ..."
+links=$(for f in $(git ls-files '*.html'); do
+          git show ":$f" 2>/dev/null \
+            | grep -ohE '(href|src)="(\./)?files/[^"]+"' \
+            | sed -E 's/.*"(\.\/)?(files\/[^"]*)"/\2/'
+        done | sed 's/[#?].*$//' | sort -u)
+n=0; broken=0
+for p in $links; do
+  n=$((n + 1))
+  git ls-files --error-unmatch "$p" >/dev/null 2>&1 || {
+    echo "[gate] BLOCKED: linked but not tracked -> $p"
+    broken=$((broken + 1))
+  }
+done
+if [ "$broken" -gt 0 ]; then
+  echo "          $broken of $n local links would 404 on the live site."
+  echo "          A renamed or newly-ignored file under files/ is the usual cause."
+  fail=1
+else
+  echo "[gate] $n local links -> tracked OK."
+fi
+
+[ "$fail" -eq 0 ] || { echo "[gate] pre-commit FAILED."; exit 1; }
+exit 0

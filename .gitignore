@@ -1,9 +1,14 @@
-files/wix/
 img/055A4375.jpg
 _private/
-
-# private working files — never publish (repo is public)
-files/eap-seminar/
-files/rs_cl*/
-
 .DS_Store
+
+# files/ is PRIVATE BY DEFAULT — this repo is public (www.yizhoujin.com).
+# Everything under files/ is ignored unless re-included below, so a new or
+# RENAMED working directory can never silently become publishable.
+# Adding a genuinely public asset dir? Add a `!` line for it here.
+files/*
+!files/cv/
+!files/other/
+!files/research/
+!files/teaching/
+!files/temp/
