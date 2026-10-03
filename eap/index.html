@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EAP/IO Seminar 2026-27</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .timeline {
+      list-style: none;
+      margin: 8px 0 16px;
+      padding: 0;
+    }
+    .timeline li {
+      padding: 4px 0;
+      display: flex;
+      gap: 14px;
+      align-items: baseline;
+    }
+    .timeline .when {
+      flex: 0 0 150px;
+      color: #666;
+      font-size: 13px;
+    }
+    .timeline .what {
+      flex: 1;
+    }
+    .timeline .active {
+      color: #0a7d2c;
+      font-weight: 600;
+    }
+    .form-section {
+      background: #fafafa;
+      border: 1px solid #e6e6e6;
+      border-radius: 6px;
+      padding: 18px 20px;
+      margin: 12px 0 18px;
+    }
+    .form-section.disabled {
+      background: #f5f5f5;
+      color: #888;
+    }
+    .form-section.disabled fieldset[disabled] {
+      border: none;
+      padding: 0;
+      margin: 0;
+      opacity: 0.55;
+    }
+    .form-section.disabled .closed-note {
+      margin: 0 0 12px;
+      color: #555;
+      font-size: 13.5px;
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .form-row input {
+      flex: 1;
+      padding: 7px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .form-row input:focus {
+      outline: none;
+      border-color: #1a0dab;
+    }
+    .form-row input[name^="name"] { flex: 0 0 38%; }
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      background: #fff;
+      resize: vertical;
+      min-height: 80px;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #1a0dab;
+    }
+    button.submit {
+      margin-top: 10px;
+      padding: 9px 18px;
+      background: #1a0dab;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    button.submit:hover { background: #1505a0; }
+    button.submit:disabled {
+      background: #bbb;
+      cursor: not-allowed;
+    }
+    button.add-row {
+      background: none;
+      border: 1px dashed #b0b0b0;
+      color: #555;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    button.add-row:hover {
+      border-color: #1a0dab;
+      color: #1a0dab;
+    }
+    .form-row input[name="sf_name"] { flex: 0 0 30%; }
+    .form-row input[name="sf_email"] { flex: 0 0 35%; }
+    .form-row input[name="sf_date"] { flex: 1; }
+    .form-row input[name="st_name"] { flex: 0 0 30%; }
+    .form-row input[name="st_email"] { flex: 0 0 35%; }
+    .form-row select[name="st_confidence"] {
+      flex: 1;
+      padding: 7px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      background: #fff;
+      color: #333;
+    }
+    .form-row select:focus { outline: none; border-color: #1a0dab; }
+    .notes-section {
+      background: #f5f7ff;
+      border: 1px solid #dde3f3;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 12px 0 0;
+      font-size: 13.5px;
+      color: #444;
+      line-height: 1.65;
+    }
+    .notes-section ul { margin: 6px 0 0 20px; padding: 0; }
+    .notes-section li { margin-bottom: 4px; }
+    .ballot-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .ballot-row:last-child { border-bottom: none; }
+    .ballot-row .nominee {
+      flex: 1;
+      font-size: 14px;
+    }
+    .ballot-row .nominee .affil {
+      color: #888;
+      font-size: 12.5px;
+      margin-left: 4px;
+    }
+    .ballot-row input[type="number"] {
+      width: 70px;
+      padding: 6px 8px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      background: #fff;
+      text-align: right;
+    }
+    .ballot-row input[type="number"]:focus {
+      outline: none;
+      border-color: #1a0dab;
+    }
+    .ballot-total {
+      margin-top: 14px;
+      padding: 8px 12px;
+      background: #fff;
+      border: 1px solid #e6e6e6;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: right;
+    }
+    .ballot-total.ok { color: #0a7d2c; border-color: #b7e4c4; background: #f1faf3; }
+    .ballot-total.over { color: #a30000; border-color: #f1c8c8; background: #fbf0f0; }
+    .preview-banner {
+      background: #fff7e0;
+      border: 1px solid #e0c870;
+      color: #6b5a16;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      margin-bottom: 12px;
+    }
+    .hint {
+      font-size: 12.5px;
+      color: #888;
+      margin-top: 6px;
+    }
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #111;
+      margin-top: 28px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <header>
+      <h1>Rotman EAP/IO Seminar &mdash; 2026&ndash;27</h1>
+    </header>
+
+    <hr>
+
+    <p>We follow a two-stage process this year:</p>
+    <ul class="timeline">
+      <li><span class="when">May 26 &ndash; May 31</span><span class="what">Nomination (closed)</span></li>
+      <li><span class="when active">Jun 1 &ndash; Jun 4</span><span class="what active">Voting &mdash; allocate 100 points across nominees (open now)</span></li>
+      <li><span class="when">Jun 5 onward</span><span class="what">Invitations begin going out to selected speakers</span></li>
+    </ul>
+
+    <hr>
+
+    <h2>Nominate (up to 5)</h2>
+    <p style="font-size:13.5px; color:#555;">
+      Nominations closed Sunday, May 31. The compiled ballot is now in the Vote section below.
+    </p>
+    <div class="form-section disabled">
+      <p class="closed-note"><strong>Nominations closed.</strong> Form left visible for reference.</p>
+      <fieldset disabled>
+      <form id="nominate-form" onsubmit="return false">
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:0; margin-bottom:6px;">Your info</h3>
+        <div class="form-row">
+          <input type="text" name="nominator_name" placeholder="Your name" autocomplete="name" required>
+          <input type="email" name="nominator_email" placeholder="Your email" autocomplete="email" required>
+        </div>
+
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Your students going on the job market</h3>
+        <p style="font-size:12.5px; color:#777; margin-bottom:8px;">
+          Internal job-market candidates we should prioritize in September/October.
+        </p>
+        <div id="student-rows">
+          <div class="form-row student-row">
+            <input type="text" name="st_name" placeholder="Student name" autocomplete="off">
+            <input type="email" name="st_email" placeholder="email@utoronto.ca" autocomplete="off">
+            <select name="st_confidence">
+              <option value="">Confidence level</option>
+              <option value="For sure going">For sure going</option>
+              <option value="Likely going">Likely going</option>
+              <option value="Still deciding">Still deciding</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="add-row" onclick="addStudentRow()">+ Add another</button>
+
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">External nominees (up to 5)</h3>
+        <div class="form-row">
+          <input type="text" name="name1" placeholder="Name 1" autocomplete="off">
+          <input type="email" name="email1" placeholder="email@institution.edu" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <input type="text" name="name2" placeholder="Name 2" autocomplete="off">
+          <input type="email" name="email2" placeholder="email@institution.edu" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <input type="text" name="name3" placeholder="Name 3" autocomplete="off">
+          <input type="email" name="email3" placeholder="email@institution.edu" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <input type="text" name="name4" placeholder="Name 4" autocomplete="off">
+          <input type="email" name="email4" placeholder="email@institution.edu" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <input type="text" name="name5" placeholder="Name 5" autocomplete="off">
+          <input type="email" name="email5" placeholder="email@institution.edu" autocomplete="off">
+        </div>
+
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Self-funded or GTA-local nominations</h3>
+        <p style="font-size:12.5px; color:#777; margin-bottom:8px;">
+          Speakers based in the GTA, or whose travel and lodging are covered by you or another source (e.g., visiting nearby and dropping in). No limit &mdash; these don't count against the ~10 external slots.
+        </p>
+        <div id="self-funded-rows">
+          <div class="form-row self-funded-row">
+            <input type="text" name="sf_name" placeholder="Name" autocomplete="off">
+            <input type="email" name="sf_email" placeholder="email@institution.edu" autocomplete="off">
+            <input type="text" name="sf_date" placeholder="Available date(s)" autocomplete="off">
+          </div>
+        </div>
+        <button type="button" class="add-row" onclick="addSelfFundedRow()">+ Add another</button>
+
+        <div style="margin-top:14px;">
+          <button type="submit" class="submit">Submit nominations</button>
+        </div>
+        <p class="hint">Deadline was Sunday, May 31.</p>
+      </form>
+      </fieldset>
+    </div>
+
+    <hr>
+
+    <h2>Vote</h2>
+    <div id="vote-closed" class="form-section disabled">
+      <p style="margin:0;">
+        Voting opens <strong>Monday, June 1</strong>. The compiled list of nominees will appear here, and you'll allocate <strong>100 points</strong> across them however you'd like.
+      </p>
+    </div>
+    <div id="vote-open" class="form-section" style="display:none;">
+      <p style="font-size:13.5px; color:#555; margin-top:0;">
+        Allocate <strong>100 points</strong> across the nominees according to your preference. Put all 100 on one person, spread them evenly, or anything in between. Leave a nominee blank if you don't want to allocate any points to them.
+      </p>
+      <form id="vote-form" onsubmit="return submitVote(event)">
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:0; margin-bottom:6px;">Your info</h3>
+        <div class="form-row">
+          <input type="text" name="voter_name" placeholder="Your name" autocomplete="name" required>
+          <input type="email" name="voter_email" placeholder="Your email" autocomplete="email" required>
+        </div>
+
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Ballot</h3>
+        <div id="ballot-rows"></div>
+
+        <div id="ballot-total" class="ballot-total">
+          Total: <span id="ballot-total-num">0</span> / 100
+        </div>
+
+        <div style="margin-top:14px;">
+          <button type="submit" class="submit">Submit vote</button>
+        </div>
+        <p class="hint">Deadline: Thursday, June 4.</p>
+      </form>
+    </div>
+
+    <hr>
+
+    <h2>Feedback</h2>
+    <div class="form-section">
+      <form id="feedback-form" onsubmit="return submitFeedback(event)">
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:0; margin-bottom:6px;">Add to the email list</h3>
+        <p style="font-size:12.5px; color:#777; margin-bottom:8px;">
+          Students, colleagues from other parts of UofT, anyone who should be getting seminar announcements.
+        </p>
+        <div id="mailing-rows">
+          <div class="form-row mailing-row">
+            <input type="text" name="ml_name" placeholder="Name" autocomplete="off">
+            <input type="email" name="ml_email" placeholder="email@institution.edu" autocomplete="off">
+          </div>
+        </div>
+        <button type="button" class="add-row" onclick="addMailingRow()">+ Add another</button>
+
+        <h3 style="font-size:13px; color:#666; text-transform:uppercase; letter-spacing:0.04em; margin-top:18px; margin-bottom:6px;">Other feedback</h3>
+        <p style="font-size:12.5px; color:#777; margin-bottom:8px;">
+          Anything on the process, room logistics, time slot, etc.
+        </p>
+        <textarea id="feedback-text" placeholder="Your feedback (optional name at the top if you want a reply)"></textarea>
+
+        <div style="margin-top:14px;">
+          <button type="submit" class="submit">Send</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="notes-section">
+      <strong>A few notes on the process:</strong>
+      <ul>
+        <li>Seminars run Mondays, 3:10&ndash;4:30 PM, September through mid-May.</li>
+        <li>Approximately 10 external speaker slots per year.</li>
+        <li>We will prioritize internal job market candidates in <del>September/October</del> <ins>November</ins>.</li>
+        <li>We avoid scheduling conflicts with external job market talks in January and early February.</li>
+        <li>Speakers who cancelled in past years will be automatically added to the voting ballot.</li>
+        <li>We will respect clear winners from the vote, but retain some flexibility to balance gender ratios and, given budget constraints, prioritize Canadian or Northeastern US speakers.</li>
+      </ul>
+    </div>
+
+    <p style="text-align:center; color:#888; font-size:12.5px; margin-top:24px;">
+      Organizers: <a href="/" target="_blank">Yizhou Jin</a> &amp; <a href="https://reginaseibel.github.io/" target="_blank">Regina Seibel</a>.
+    </p>
+
+  </div>
+
+  <script>
+    // Paste the deployment URL of your Apps Script Web App here.
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmW98Hx26xoKYQd_NMesgxXrV_BkV5HjKjCE9oM6PM7DdJgGfIJiztPfN2cNuN4TAD/exec";
+
+    // Fallback recipients if the script call fails.
+    const ORG_EMAILS = "yizhou.jin@utoronto.ca,regina.seibel@rotman.utoronto.ca";
+
+    // ---- Vote ballot ----
+    // On May 31, after nominations close, the organizers compile the final
+    // ballot here (external nominees from form submissions + auto-added past
+    // cancellations). Voting opens automatically once this array is non-empty.
+    // Each entry: { name: "...", affiliation: "..." }
+    const BALLOT = [
+      { name: "Matthew Backus", affiliation: "Berkeley Haas" },
+      { name: "Levon Barseghyan", affiliation: "Cornell" },
+      { name: "David Byrne", affiliation: "Melbourne" },
+      { name: "José Ignacio Cuesta", affiliation: "Stanford" },
+      { name: "Rebekah Dix", affiliation: "Stanford" },
+      { name: "Jean-Pierre Dube", affiliation: "Chicago Booth" },
+      { name: "Pierre Dubois", affiliation: "Toulouse" },
+      { name: "Keith Ericson", affiliation: "BU" },
+      { name: "Vitor Farinha Luz", affiliation: "UBC" },
+      { name: "Andres Gonzalez-Lira", affiliation: "PUC Chile" },
+      { name: "Matthew Grennan", affiliation: "Berkeley Haas" },
+      { name: "Igal Hendel", affiliation: "Northwestern" },
+      { name: "Jean Francois Houde", affiliation: "Wisconsin" },
+      { name: "Yufeng Huang", affiliation: "Rochester (Simon)" },
+      { name: "Thomas Hubbard", affiliation: "Kellogg" },
+      { name: "Myrto Kalouptsidi", affiliation: "Harvard" },
+      { name: "Yunmi Kong", affiliation: "Rice" },
+      { name: "Greg Lewis", affiliation: "Amazon" },
+      { name: "Lorenzo Magnolfi", affiliation: "Wisconsin" },
+      { name: "Guillermo Marshall", affiliation: "UBC Sauder" },
+      { name: "Leslie Marx", affiliation: "Duke" },
+      { name: "Nathan Miller", affiliation: "Georgetown" },
+      { name: "Francesca Molinari", affiliation: "Cornell" },
+      { name: "Felix Montag", affiliation: "NYU Stern" },
+      { name: "Charlie Murry", affiliation: "Michigan" },
+      { name: "Leon Musolff", affiliation: "Wharton" },
+      { name: "Eric Richert", affiliation: "Chicago" },
+      { name: "Justin Sydnor", affiliation: "Wisconsin" },
+      { name: "Elie Tamer", affiliation: "Harvard" },
+      { name: "Audrey Tiew", affiliation: "NYU" },
+      { name: "Frank Verboven", affiliation: "KU Leuven" },
+      { name: "Tianli Xia", affiliation: "Rochester" },
+    ];
+
+    // Dummy ballot used when the page is loaded with ?preview in the URL,
+    // so organizers can preview the voting UI before populating BALLOT.
+    const PREVIEW_BALLOT = [
+      { name: "Alessandro Gavazza", affiliation: "LSE" },
+      { name: "Ali Yurukoglu", affiliation: "Stanford GSB" },
+      { name: "Chris Sullivan", affiliation: "Calgary" },
+      { name: "Ginger Jin", affiliation: "Maryland" },
+      { name: "Shoshana Vasserman", affiliation: "Stanford GSB" },
+      { name: "Christopher Conlon", affiliation: "NYU Stern" }
+    ];
+
+    async function postToSheet(payload) {
+      // text/plain content-type avoids a CORS preflight on Apps Script.
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        redirect: "follow",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "text/plain;charset=utf-8" }
+      });
+      const data = await res.json();
+      if (data.status !== "ok") throw new Error(data.message || "Unknown error");
+      return data;
+    }
+
+    function showThanks(form, msg) {
+      const section = form.closest(".form-section");
+      section.innerHTML =
+        '<p style="margin:0; color:#0a7d2c; font-weight:600;">' + msg + '</p>';
+    }
+
+    function mailtoFallback(subject, body) {
+      window.location.href = "mailto:" + ORG_EMAILS +
+        "?subject=" + encodeURIComponent(subject) +
+        "&body=" + encodeURIComponent(body);
+    }
+
+    function addSelfFundedRow() {
+      const container = document.getElementById("self-funded-rows");
+      const row = document.createElement("div");
+      row.className = "form-row self-funded-row";
+      row.innerHTML =
+        '<input type="text" name="sf_name" placeholder="Name" autocomplete="off">' +
+        '<input type="email" name="sf_email" placeholder="email@institution.edu" autocomplete="off">' +
+        '<input type="text" name="sf_date" placeholder="Available date(s)" autocomplete="off">';
+      container.appendChild(row);
+    }
+
+    function addStudentRow() {
+      const container = document.getElementById("student-rows");
+      const row = document.createElement("div");
+      row.className = "form-row student-row";
+      row.innerHTML =
+        '<input type="text" name="st_name" placeholder="Student name" autocomplete="off">' +
+        '<input type="email" name="st_email" placeholder="email@utoronto.ca" autocomplete="off">' +
+        '<select name="st_confidence">' +
+          '<option value="">Confidence level</option>' +
+          '<option value="For sure going">For sure going</option>' +
+          '<option value="Likely going">Likely going</option>' +
+          '<option value="Still deciding">Still deciding</option>' +
+        '</select>';
+      container.appendChild(row);
+    }
+
+    function addMailingRow() {
+      const container = document.getElementById("mailing-rows");
+      const row = document.createElement("div");
+      row.className = "form-row mailing-row";
+      row.innerHTML =
+        '<input type="text" name="ml_name" placeholder="Name" autocomplete="off">' +
+        '<input type="email" name="ml_email" placeholder="email@institution.edu" autocomplete="off">';
+      container.appendChild(row);
+    }
+
+    function collectNominationPayload(f) {
+      const students = [];
+      document.querySelectorAll(".student-row").forEach(row => {
+        const name = row.querySelector('input[name="st_name"]').value.trim();
+        const email = row.querySelector('input[name="st_email"]').value.trim();
+        const confidence = row.querySelector('select[name="st_confidence"]').value;
+        if (name || email) students.push({ name, email, confidence });
+      });
+      const nominees = [];
+      for (let i = 1; i <= 5; i++) {
+        const name = (f["name" + i].value || "").trim();
+        const email = (f["email" + i].value || "").trim();
+        if (name || email) nominees.push({ name, email });
+      }
+      const selfFunded = [];
+      document.querySelectorAll(".self-funded-row").forEach(row => {
+        const name = row.querySelector('input[name="sf_name"]').value.trim();
+        const email = row.querySelector('input[name="sf_email"]').value.trim();
+        const date = row.querySelector('input[name="sf_date"]').value.trim();
+        if (name || email || date) selfFunded.push({ name, email, date });
+      });
+      return {
+        type: "nomination",
+        nominator_name: (f.nominator_name.value || "").trim(),
+        nominator_email: (f.nominator_email.value || "").trim(),
+        students,
+        nominees,
+        self_funded: selfFunded
+      };
+    }
+
+    async function submitNomination(e) {
+      e.preventDefault();
+      const f = e.target;
+      const payload = collectNominationPayload(f);
+      if (payload.students.length === 0 && payload.nominees.length === 0 && payload.self_funded.length === 0) {
+        alert("Please add at least one nomination.");
+        return false;
+      }
+      const btn = f.querySelector('button[type="submit"]');
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+      try {
+        if (!SCRIPT_URL) throw new Error("Submission endpoint not configured.");
+        await postToSheet(payload);
+        showThanks(f, "Thanks! Your nominations have been recorded.");
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = orig;
+        const proceed = confirm(
+          "Could not save submission automatically (" + err.message + ").\n\n" +
+          "Click OK to send your nominations by email instead, or Cancel to retry."
+        );
+        if (proceed) {
+          const stLines = payload.students.map((n, i) => `${i+1}. ${n.name}${n.email ? "  <" + n.email + ">" : ""}${n.confidence ? "  [" + n.confidence + "]" : ""}`);
+          const lines = payload.nominees.map((n, i) => `${i+1}. ${n.name}${n.email ? "  <" + n.email + ">" : ""}`);
+          const sfLines = payload.self_funded.map((n, i) => `${i+1}. ${n.name}${n.email ? "  <" + n.email + ">" : ""}${n.date ? "  [" + n.date + "]" : ""}`);
+          const subject = "EAP/IO Seminar 2026-27: Nominations from " + (payload.nominator_name || "(anonymous)");
+          let body = `From: ${payload.nominator_name} <${payload.nominator_email}>\n\n`;
+          if (stLines.length) body += "Students going on the job market:\n\n" + stLines.join("\n") + "\n\n";
+          if (lines.length) body += "External nominees:\n\n" + lines.join("\n") + "\n\n";
+          if (sfLines.length) body += "Self-funded or GTA-local nominations:\n\n" + sfLines.join("\n") + "\n\n";
+          mailtoFallback(subject, body);
+        }
+      }
+      return false;
+    }
+
+    function collectFeedbackPayload() {
+      const mailingList = [];
+      document.querySelectorAll(".mailing-row").forEach(row => {
+        const name = row.querySelector('input[name="ml_name"]').value.trim();
+        const email = row.querySelector('input[name="ml_email"]').value.trim();
+        if (name || email) mailingList.push({ name, email });
+      });
+      const text = document.getElementById("feedback-text").value.trim();
+      return { type: "feedback", mailing_list: mailingList, feedback: text };
+    }
+
+    async function submitFeedback(e) {
+      e.preventDefault();
+      const f = e.target;
+      const payload = collectFeedbackPayload();
+      if (payload.mailing_list.length === 0 && !payload.feedback) {
+        alert("Nothing to send.");
+        return false;
+      }
+      const btn = f.querySelector('button[type="submit"]');
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+      try {
+        if (!SCRIPT_URL) throw new Error("Submission endpoint not configured.");
+        await postToSheet(payload);
+        showThanks(f, "Thanks! Your feedback has been recorded.");
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = orig;
+        const proceed = confirm(
+          "Could not save submission automatically (" + err.message + ").\n\n" +
+          "Click OK to send by email instead, or Cancel to retry."
+        );
+        if (proceed) {
+          const subject = "EAP/IO Seminar 2026-27: Feedback";
+          let body = "";
+          if (payload.mailing_list.length) {
+            body += "Add to mailing list:\n\n" +
+              payload.mailing_list.map((m, i) => `${i+1}. ${m.name}${m.email ? "  <" + m.email + ">" : ""}`).join("\n") + "\n\n";
+          }
+          if (payload.feedback) body += "Feedback:\n\n" + payload.feedback + "\n\n";
+          mailtoFallback(subject, body);
+        }
+      }
+      return false;
+    }
+
+    // ---- Vote ----
+
+    function initVoting() {
+      const preview = new URLSearchParams(location.search).has("preview");
+      const ballot = preview ? PREVIEW_BALLOT : BALLOT;
+      const closed = document.getElementById("vote-closed");
+      const open = document.getElementById("vote-open");
+      if (ballot.length === 0) {
+        closed.style.display = "";
+        open.style.display = "none";
+        return;
+      }
+      closed.style.display = "none";
+      open.style.display = "";
+      renderBallot(ballot, preview);
+    }
+
+    function renderBallot(ballot, isPreview) {
+      const container = document.getElementById("ballot-rows");
+      container.innerHTML = "";
+      if (isPreview) {
+        const banner = document.createElement("div");
+        banner.className = "preview-banner";
+        banner.textContent = "Preview mode — this is what voters will see once the BALLOT array is populated. Submissions in preview mode still post to the live Sheet.";
+        container.parentNode.insertBefore(banner, container);
+      }
+      ballot.forEach((nominee, idx) => {
+        const row = document.createElement("div");
+        row.className = "ballot-row";
+        row.dataset.index = idx;
+        row.innerHTML =
+          '<div class="nominee">' +
+            escapeHtml(nominee.name) +
+            (nominee.affiliation ? '<span class="affil">(' + escapeHtml(nominee.affiliation) + ')</span>' : '') +
+          '</div>' +
+          '<input type="number" min="0" max="100" step="1" placeholder="0" oninput="updateBallotTotal()">';
+        container.appendChild(row);
+      });
+      updateBallotTotal();
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    function updateBallotTotal() {
+      let total = 0;
+      document.querySelectorAll(".ballot-row input[type=number]").forEach(inp => {
+        const v = parseFloat(inp.value);
+        if (!isNaN(v)) total += v;
+      });
+      const numEl = document.getElementById("ballot-total-num");
+      const wrap = document.getElementById("ballot-total");
+      // Round display to 1 decimal to avoid 99.99999... noise.
+      numEl.textContent = Math.round(total * 100) / 100;
+      wrap.classList.remove("ok", "over");
+      const isHundred = Math.abs(total - 100) < 0.0001;
+      if (isHundred) wrap.classList.add("ok");
+      else if (total > 100) wrap.classList.add("over");
+      const submitBtn = document.querySelector('#vote-form button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = !isHundred;
+    }
+
+    function collectVotePayload(f) {
+      const preview = new URLSearchParams(location.search).has("preview");
+      const ballot = preview ? PREVIEW_BALLOT : BALLOT;
+      const allocations = [];
+      document.querySelectorAll(".ballot-row").forEach(row => {
+        const idx = parseInt(row.dataset.index, 10);
+        const points = parseFloat(row.querySelector('input[type=number]').value);
+        if (!isNaN(points) && points > 0) {
+          allocations.push({
+            name: ballot[idx].name,
+            affiliation: ballot[idx].affiliation || "",
+            points: points
+          });
+        }
+      });
+      return {
+        type: "vote",
+        voter_name: (f.voter_name.value || "").trim(),
+        voter_email: (f.voter_email.value || "").trim(),
+        allocations: allocations,
+        preview: preview
+      };
+    }
+
+    async function submitVote(e) {
+      e.preventDefault();
+      const f = e.target;
+      const payload = collectVotePayload(f);
+      const total = payload.allocations.reduce((s, a) => s + a.points, 0);
+      if (Math.abs(total - 100) > 0.0001) {
+        alert("Your points must add up to exactly 100 (currently " + (Math.round(total * 100) / 100) + ").");
+        return false;
+      }
+      const btn = f.querySelector('button[type="submit"]');
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+      try {
+        if (!SCRIPT_URL) throw new Error("Submission endpoint not configured.");
+        await postToSheet(payload);
+        showThanks(f, "Thanks! Your vote has been recorded.");
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = orig;
+        const proceed = confirm(
+          "Could not save submission automatically (" + err.message + ").\n\n" +
+          "Click OK to send your vote by email instead, or Cancel to retry."
+        );
+        if (proceed) {
+          const subject = "EAP/IO Seminar 2026-27: Vote from " + (payload.voter_name || "(anonymous)");
+          let body = `From: ${payload.voter_name} <${payload.voter_email}>\n\n` +
+            "Allocations:\n\n" +
+            payload.allocations.map(a => `${a.name}${a.affiliation ? " (" + a.affiliation + ")" : ""}: ${a.points}`).join("\n") +
+            `\n\nTotal: ${total}\n\n--\nSubmitted via the EAP organizing page.`;
+          mailtoFallback(subject, body);
+        }
+      }
+      return false;
+    }
+
+    document.addEventListener("DOMContentLoaded", initVoting);
+  </script>
+
+</body>
+</html>
