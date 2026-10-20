@@ -181,14 +181,62 @@ footer p {
     font-size: 24px;
   }
 
-  .header-row {
-    flex-direction: column;
-    gap: 16px;
+  /* Phone header (author pick 2026-10-20): photo beside the name and contact lines, bio below. */
+  header.profile {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    column-gap: 14px;
+    align-items: start;
+  }
+
+  .header-row,
+  .header-left {
+    display: contents;
+  }
+
+  .profile h1 {
+    grid-column: 2;
+    grid-row: 1;
+    line-height: 1.25;
+    margin-bottom: 4px;
   }
 
   .headshot {
-    width: 130px;
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    width: 96px;
+    margin-bottom: 0;
   }
+
+  .header-left p {
+    grid-column: 2;
+    margin-bottom: 0;
+    line-height: 1.55;
+  }
+
+  .header-right {
+    grid-column: 1 / -1;
+    margin-top: 16px;
+  }
+
+  /* Full width for section contents and summaries on phones. */
+  details > *:not(summary) {
+    padding-left: 0;
+  }
+
+  summary {
+    padding: 10px 0;
+  }
+
+  .paper details.abstract > p {
+    padding-left: 10px;
+    border-left: 2px solid #e3e3e3;
+  }
+}
+
+/* Each "[link]" stays on one line (2026-10-20). */
+.lk {
+  white-space: nowrap;
 }
 
 /* Per-paper summary toggles (added 2026-10-01): small, collapsed by default, under each paper's links. */
