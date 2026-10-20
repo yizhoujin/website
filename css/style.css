@@ -70,6 +70,26 @@ h1 {
   margin-bottom: 8px;
 }
 
+/* "more" at the end of the header paragraphs opens the Research, Teaching and Other Work tabs;
+   styled like the papers' Summary toggles (2026-10-20). */
+.tab-link {
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  margin-left: 2px;
+}
+
+.tab-link::before {
+  content: "▸ ";
+  color: #888;
+}
+
+.tab-link:hover {
+  text-decoration: none;
+  color: #1a0dab;
+}
+
 .icon-emoji {
   width: 1em;
   height: 1em;
