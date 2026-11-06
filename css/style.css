@@ -259,6 +259,11 @@ footer p {
   white-space: nowrap;
 }
 
+/* Grey "[new]" in front of a paper's title (author request 2026-11-06). */
+.new {
+  color: #888;
+}
+
 /* Per-paper summary toggles (added 2026-10-01): small, collapsed by default, under each paper's links. */
 .paper details.abstract {
   padding: 0 0 6px 0;
